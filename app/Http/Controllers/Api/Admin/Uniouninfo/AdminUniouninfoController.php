@@ -496,7 +496,7 @@ class AdminUniouninfoController extends Controller
                 'short_name_b' => $union->bn_name,
                 'thana' => $Upazila->bn_name,
                 'district' => $Upazila->district->bn_name,
-                'c_type' => "চেয়ারম্যান",
+                'c_type' => "প্রশাসক",
                 'c_type_en' => "Chairman",
                 'u_code' => $unionCode,
                 "defaultColor" => "green",

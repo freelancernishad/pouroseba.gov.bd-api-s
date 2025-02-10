@@ -139,10 +139,10 @@ class UserUniouninfoController extends Controller
         // Map Bengali `c_type` to English `c_type_en`
         if (isset($validatedData['c_type'])) {
             $cTypeMap = [
-                'চেয়ারম্যান' => 'Chairman',
-                'প্যানেল চেয়ারম্যান ১' => 'Panel Chairman 1',
-                'প্যানেল চেয়ারম্যান ২' => 'Panel Chairman 2',
-                'প্যানেল চেয়ারম্যান ৩' => 'Panel Chairman 3',
+                'মেয়র' => 'Mayor',
+                'প্যানেল মেয়র ১' => 'Panel Mayor 1',
+                'প্যানেল মেয়র ২' => 'Panel Mayor 2',
+                'প্যানেল মেয়র ৩' => 'Panel Mayor 3',
                 'প্রশাসক' => 'Administrator',
                 'সদস্য/সদস্যা' => 'Member',
             ];
