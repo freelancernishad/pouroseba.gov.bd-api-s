@@ -271,7 +271,8 @@ function handleFileUrl($filePath, $defaultImage = 'https://api.uniontax.gov.bd/b
         // Check if the application is running on localhost
         if (!isLocalRequest()) {
             // Generate the full URL for the file
-            return URL::to('/files/' . $filePath);
+            return asset('files/' . $filePath);
+
         } else {
             // Use the default image from the live server
             return $defaultImage;
