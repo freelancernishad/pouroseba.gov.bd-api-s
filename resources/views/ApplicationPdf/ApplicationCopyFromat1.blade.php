@@ -51,7 +51,7 @@
         <div>
             <img width="70px" src="{{ base64('backend/bd-logo.png') }}" />
         </div>
-        
+
         <div style="width:300px;margin:0 auto;" ><p style="margin-bottom:0 !important;font-size:16px">  গণপ্রজাতন্ত্রী বাংলাদেশ
             <h2 style="margin: 0;">{{ $uniouninfo->full_name }}</h2>
             উপজেলা:  {{ $uniouninfo->thana }}, জেলা:  {{ $uniouninfo->district }} ।
@@ -183,7 +183,7 @@
         </tr>
     </table>
 
-    <p class="footer">"সময়মত ইউনিয়ন কর পরিশোধ করুন। ইউনিয়নের উন্নয়নমূলক কাজে সহায়তা করুন"</p>
+    <p class="footer">"সময়মত পৌর কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন।"</p>
     <p class="footer-small">'ডিজিটাল ইউনিয়ন ট্যাক্স ও সেবা সিস্টেম' {{ $uniouninfo->domain }} এর সাথে থাকার জন্য ধন্যবাদ</p>
 
 </body>

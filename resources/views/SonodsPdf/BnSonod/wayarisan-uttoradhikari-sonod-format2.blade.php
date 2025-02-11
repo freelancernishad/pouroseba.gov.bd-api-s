@@ -108,7 +108,7 @@
             </table>
 
             <p style="background: #787878; color: white; text-align: center; padding: 2px 2px; font-size: 12px; margin-top: 0px; margin:0" class="m-0">
-                "সময়মত ইউনিয়ন কর পরিশোধ করুন। ইউনিয়নের উন্নয়নমূলক কাজে সহায়তা করুন"
+                "সময়মত পৌর কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন।"
             </p>
             <p class="m-0" style="font-size:12px;text-align:center;margin:0;position: fixed; bottom: 0;">
                 ইস্যুকৃত সনদটি যাচাই করতে QR কোড স্ক্যান করুন অথবা ভিজিট করুন {{ $uniouninfo->domain }}
