@@ -148,7 +148,7 @@
                 </tr>
             </table>
             <p style="background: #787878; color: white; text-align: center; padding: 2px 2px;font-size: 13px; margin-top: 0px; margin-bottom: 0px;" class="m-0">
-                "Pay union tax on time. Support the development work of the union."
+                "Pay municipal tax on time. Support the development work of the municipality."
             </p>
             <p class="m-0" style="font-size:12px;text-align:center;margin:0 !important">To verify this certificate, scan the <span class="english_text">QR</span> code or visit <span class="english_text">{{ $uniouninfo->domain }}</span></p>
         </div>
