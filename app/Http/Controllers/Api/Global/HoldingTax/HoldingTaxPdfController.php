@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers\Api\Global\HoldingTax;
 
+use App\Models\Payment;
 use App\Models\Holdingtax;
 use App\Models\Uniouninfo;
 use Illuminate\Http\Request;
 use App\Models\HoldingBokeya;
+use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
-use App\Models\Payment;
 
 class HoldingTaxPdfController extends Controller
 {
@@ -135,6 +136,112 @@ class HoldingTaxPdfController extends Controller
     }
 
 
+    public function bokeyaReport(Request $request)
+    {
+        ini_set('max_execution_time', '60000');
+        ini_set("pcre.backtrack_limit", "50000000000000000");
+        ini_set('memory_limit', '12008M');
+
+
+        $token = $request->query('token');
+
+        if (!$token) {
+            return response()->json(['error' => 'No token provided.'], 400);
+        }
+
+        try {
+            $authenticatedEntity = JWTAuth::setToken($token)->authenticate();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Unauthorized. Invalid token.'], 403);
+        }
+
+        if (!$authenticatedEntity) {
+            return response()->json(['error' => 'Unauthorized. Invalid token.'], 403);
+        }
+
+        // Get the 'unioun_name' from the authenticated entity
+        $union = $authenticatedEntity->unioun;
+
+        // $union = $request->union;
+
+
+        $word = $request->word;
+        $status = 'Unpaid';
+        $uniouninfo = Uniouninfo::where(['short_name_e' => $union])->first();
+
+        if (!$word && !$union) {
+            $holdingtaxs = Holdingtax::with(['holdingBokeyas' => function ($query) use ($status) {
+                $query->where('status', $status)->where('price', '!=', '0');
+            }])->orderBy('id', 'desc')->get();
+
+            $holdingtaxs = $holdingtaxs->filter(function ($holdingTax) {
+                return !$holdingTax->holdingBokeyas->isEmpty();
+            });
+
+            $htmlView = view('pdf.unpaidHolding', compact('uniouninfo', 'holdingtaxs', 'word'))->render();
+            $fileName = 'report-' . date('Y-m-d H:m:s');
+
+            // Optional: Add header and footer if needed
+            $header = null;
+            $footer = null;
+
+            generatePdf($htmlView, $header, $footer, "$fileName.pdf", 'A4');
+            return response()->stream(function () use ($htmlView) {
+                echo $htmlView;
+            }, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $fileName . '.pdf"',
+            ]);
+        }
+
+        if (!$word) {
+            $holdingtaxs = Holdingtax::with(['holdingBokeyas' => function ($query) use ($status) {
+                $query->where('status', $status)->where('price', '!=', '0');
+            }])->where(['unioun' => $union])->orderBy('id', 'desc')->get();
+
+            $holdingtaxs = $holdingtaxs->filter(function ($holdingTax) {
+                return !$holdingTax->holdingBokeyas->isEmpty();
+            });
+
+            $htmlView = view('pdf.unpaidHolding', compact('uniouninfo', 'holdingtaxs', 'word'))->render();
+            $fileName = 'Invoice-' . date('Y-m-d H:m:s');
+
+            // Optional: Add header and footer if needed
+            $header = null;
+            $footer = null;
+
+            generatePdf($htmlView, $header, $footer, "$fileName.pdf", 'A4');
+            return response()->stream(function () use ($htmlView) {
+                echo $htmlView;
+            }, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="' . $fileName . '.pdf"',
+            ]);
+        }
+
+        $holdingtaxs = Holdingtax::with(['holdingBokeyas' => function ($query) use ($status) {
+            $query->where('status', $status)->where('price', '!=', '0');
+        }])->where(['unioun' => $union, 'word_no' => $word])->orderBy('id', 'desc')->get();
+
+        $holdingtaxs = $holdingtaxs->filter(function ($holdingTax) {
+            return !$holdingTax->holdingBokeyas->isEmpty();
+        });
+
+        $htmlView = view('pdf.unpaidHolding', compact('uniouninfo', 'holdingtaxs', 'word'))->render();
+        $fileName = 'Invoice-' . date('Y-m-d H:m:s');
+
+        // Optional: Add header and footer if needed
+        $header = null;
+        $footer = null;
+
+        generatePdf($htmlView, $header, $footer, "$fileName.pdf", 'A4');
+        return response()->stream(function () use ($htmlView) {
+            echo $htmlView;
+        }, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="' . $fileName . '.pdf"',
+        ]);
+    }
 
 
 

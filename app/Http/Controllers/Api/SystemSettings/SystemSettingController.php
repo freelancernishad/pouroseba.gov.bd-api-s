@@ -78,6 +78,8 @@ class SystemSettingController extends Controller
 
     public function clearCache()
     {
+
+
         try {
             // Clear and cache config
             Artisan::call('config:clear');

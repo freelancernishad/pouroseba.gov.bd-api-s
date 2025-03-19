@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateAdmin;
+use App\Http\Controllers\PurchaseSmsController;
 use App\Http\Controllers\Api\AllowedOriginController;
 use App\Http\Controllers\Api\Coupon\CouponController;
 use App\Http\Controllers\Api\Admin\Users\UserController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Api\User\Sonod\UserSonodController;
 use App\Http\Controllers\Api\Admin\Reports\ReportsController;
 use App\Http\Controllers\Api\Payments\FailedPaymentController;
 use App\Http\Controllers\Api\Admin\Package\AdminPackageController;
+use App\Http\Controllers\Api\User\SonodName\UserSonodFeeController;
 use App\Http\Controllers\Api\SystemSettings\SystemSettingController;
 use App\Http\Controllers\Api\Admin\Transitions\AdminPaymentController;
 use App\Http\Controllers\Api\Admin\Uniouninfo\AdminUniouninfoController;
@@ -149,8 +151,15 @@ Route::prefix('admin')->group(function () {
         Route::post('/upazilas/{upazilaId}/uniouninfo', [AdminUniouninfoController::class, 'getUniouninfoByUpazila']);
 
 
+        Route::prefix('/sonodfees')->group(function () {
+            Route::post('/', [UserSonodFeeController::class, 'store']); // Create multiple SonodFees
+            Route::put('/', [UserSonodFeeController::class, 'update']); // Update multiple SonodFees
+        });
+        Route::get('sonodnamelist/with-fees', [UserSonodFeeController::class, 'getSonodnamelistsWithFees']);
+        Route::post('sonodnamelist/with-fees', [UserSonodFeeController::class, 'getSonodnamelistsWithFees']);
 
-
+        Route::put('/sms-purchase/{trx_id}/approve', [PurchaseSmsController::class, 'approveSmsPurchase']);
+        Route::put('/sms-purchase/{trx_id}/reject', [PurchaseSmsController::class, 'rejectSmsPurchase']);
 
 
 
@@ -159,4 +168,6 @@ Route::prefix('admin')->group(function () {
 
 
 Route::get('/upazilas/{upazilaId}/uniouninfo/pdf', [AdminUniouninfoController::class, 'getUniouninfoByUpazilaAndGenaratePdf']);
+Route::get('/upazilas/{upazilaId}/uniouninfo/excel', [AdminUniouninfoController::class, 'getUniouninfoByUpazilaAndGenarateExcel']);
 
+Route::get('sonodnamelist/with-fees', [UserSonodFeeController::class, 'getSonodnamelistsWithFees']);

@@ -3,6 +3,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateUser;
+use App\Http\Controllers\PurchaseSmsController;
+use App\Http\Controllers\HoldingTaxImportController;
 use App\Http\Controllers\Api\Coupon\CouponController;
 use App\Http\Controllers\Api\Auth\User\AuthUserController;
 use App\Http\Controllers\Api\User\Sonod\UserSonodController;
@@ -65,6 +67,12 @@ Route::prefix('user')->group(function () {
         Route::get('holdingtax/{id}', [HoldingtaxController::class, 'getSingleHoldingTaxWithBokeyas']);
         Route::put('/holding-bokeya/{id}/update-price', [HoldingtaxController::class, 'updateUnpaidHoldingBokeyaPrice']);
 
+        Route::post('/holding-tax/import', [HoldingTaxImportController::class, 'import']);
+        Route::get('/holding-tax/export', [HoldingTaxImportController::class, 'export']);
+
+
+
+
         // Update Holdingtax only
         Route::put('/holdingtax/{id}', [HoldingtaxController::class, 'updateHoldingtaxOnly']);
 
@@ -108,6 +116,16 @@ Route::prefix('user')->group(function () {
 
 
 
+
+        Route::get('purchasesms/list', [PurchaseSmsController::class, 'getSmsPurchaseListByUnion']);
+        Route::post('/sms-purchase', [PurchaseSmsController::class, 'createSmsPurchase']);
+
+
+
+
+
+
+
     });
 
 });
@@ -138,3 +156,8 @@ Route::post('/verify-otp', [VerificationController::class, 'verifyOtp']);
 Route::post('/resend/otp', [VerificationController::class, 'resendOtp']);
 Route::get('/email/verify/{hash}', [VerificationController::class, 'verifyEmail']);
 Route::post('/resend/verification-link', [VerificationController::class, 'resendVerificationLink']);
+
+
+
+
+

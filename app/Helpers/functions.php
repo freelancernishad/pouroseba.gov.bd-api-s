@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use App\Models\TokenBlacklist;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Validator;
 

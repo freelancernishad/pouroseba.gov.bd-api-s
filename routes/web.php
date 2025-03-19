@@ -12,6 +12,23 @@ use App\Http\Controllers\Api\Global\Sonod\DocumentPdfController;
 use App\Http\Controllers\Api\User\Reports\PaymentReportsController;
 use App\Http\Controllers\Api\SystemSettings\SystemSettingController;
 use App\Http\Controllers\Api\Global\HoldingTax\HoldingTaxPdfController;
+use App\Http\Controllers\Api\Global\Sonod\SonodController;
+
+
+Route::get('create/payment', [SonodController::class,'creatingEkpayUrl']);
+
+
+Route::get('/check-octane', function () {
+    if (app()->bound('octane') && app('octane')->isRunning()) {
+        return response()->json(['status' => 'Octane is running']);
+    }
+
+    return response()->json(['status' => 'Octane is not running']);
+});
+
+
+
+
 
 
 
@@ -38,13 +55,15 @@ Route::get('payment/report/download', [PaymentReportsController::class,'PaymentR
 Route::get('/download/reports/get-reports', [ReportsController::class,'downloadReports']);
 
 
+Route::get('holding/tax/bokeya/list',[HoldingTaxPdfController::class,'bokeyaReport']);
+
 
 Route::get('holding/tax/invoice/{id}', [HoldingTaxPdfController::class,'holdingPaymentInvoice']);
 Route::get('/holding/tax/certificate_of_honor/{id}', [HoldingTaxPdfController::class,'holdingCertificate_of_honor']);
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return response()->json('success');
 });
 
 // For web routes

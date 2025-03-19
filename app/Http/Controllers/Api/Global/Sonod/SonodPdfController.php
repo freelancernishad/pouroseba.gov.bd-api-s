@@ -25,27 +25,25 @@ class SonodPdfController extends Controller
      */
     public function sonodDownload(Request $request, $id)
     {
-
-
+        // Increase max execution time, memory limit
         ini_set('max_execution_time', '60000');
         ini_set("pcre.backtrack_limit", "50000000000000000");
         ini_set('memory_limit', '12008M');
 
+        // Retrieve the "en" parameter from the request
         $en = $request->en;
 
-
-
-
-
-        if($en){
-            $sonod = Sonod::select('id','sonod_Id','stutus','sonod_name','unioun_name')->with('english_sonod')->findOrFail($id);
+        // Load the Sonod data based on the "en" flag
+        if ($en) {
+            $sonod = Sonod::select('id','sonod_Id','stutus','sonod_name','unioun_name')
+                        ->with('english_sonod')->findOrFail($id);
             $row = $sonod->english_sonod;
             $sonod_Id = $sonod->sonod_Id;
             $stutus = $sonod->stutus;
             $sonod_name = $sonod->sonod_name;
             $unioun_name = $sonod->unioun_name;
             $font_family = '';
-        }else{
+        } else {
             $row = Sonod::find($id);
             $sonod_Id = $row->sonod_Id;
             $stutus = $row->stutus;
@@ -54,60 +52,55 @@ class SonodPdfController extends Controller
             $font_family = $row->font_family;
         }
 
-
-
-
-
-
-
+        // Check for cancellation status
         if ($stutus == 'cancel') {
             return response("<h1 style='color:red;text-align:center'>সনদটি বাতিল করা হয়েছে!<h1>", 403);
         }
 
+        // Check for approval status
         if ($stutus != 'approved') {
             return response("<h1 style='color:red;text-align:center'>সনদটি এখনো অনুমোদন করা হয়নি !<h1>", 403);
         }
 
-
-        $signatureFields = ['socib_signture', 'chaireman_sign','image'];
-        // Handle signature fields
+        // Handle signature fields first
+        $signatureFields = ['socib_signture', 'chaireman_sign', 'image'];
         foreach ($signatureFields as $field) {
-            $row->$field = handleFileUrl($row->$field);
+            $row->$field = convertToBase64($row->$field); // Ensure all URLs are resolved first
         }
 
-
-
-
-
+        // Load Uniouninfo and Sonodnamelist
         $uniouninfo = Uniouninfo::where('short_name_e', $unioun_name)->first();
         $sonodnames = Sonodnamelist::where('bnname', $sonod_name)->first();
         $filename = str_replace(" ", "_", $sonodnames->enname) . "-$row->sonod_Id.pdf";
-        // Handle sonod_logo in $uniouninfo
-        $uniouninfo->sonod_logo = handleFileUrl($uniouninfo->sonod_logo);
 
-        // return $row;
+        // Handle sonod_logo for Uniouninfo
+        $uniouninfo->sonod_logo = convertToBase64($uniouninfo->sonod_logo);
 
-        Log::info($row->sonod_Id);
-        Log::info($row);
-        $htmlContent = $this->getHtmlContent($row, $sonod_name, $uniouninfo, $sonodnames,$sonod_Id,$en,$font_family);
+        // Log the data (for debugging)
+        // Log::info($row->image);
+        // Log::info($row->chaireman_sign);
+        // Log::info($row->socib_signture);
+        // Log::info($row);
 
+        // Generate HTML content for PDF
+        $htmlContent = $this->getHtmlContent($row, $sonod_name, $uniouninfo, $sonodnames, $sonod_Id, $en, $font_family);
+
+        // Generate the PDF
+        $header = null;
+        $footer = null;
+
+        // If the sonod name is special, include custom header/footer
         if ($sonod_name == 'ওয়ারিশান সনদ' || $sonod_name == 'উত্তরাধিকারী সনদ') {
-            $header = null;
-            $footer = null;
             if ($row->format == 1) {
                 $header = $this->pdfHeader($id, $filename);
                 $footer = $this->pdfFooter($id, $filename);
             }
-            generatePdf($htmlContent, $header, $footer, $filename,"A4",$font_family);
-        }else{
-            generatePdf($htmlContent, $header=null, $footer=null, $filename,"A4",$font_family);
-
+            generatePdf($htmlContent, $header, $footer, $filename, "A4", $font_family);
+        } else {
+            generatePdf($htmlContent, $header = null, $footer = null, $filename, "A4", $font_family);
         }
-
-
-
-
     }
+
 
 
     function sonodVerify(Request $request, $id) {

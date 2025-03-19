@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api\User\SonodName;
 
 use App\Models\SonodFee;
-use App\Models\Sonodnamelist;
+use App\Models\Uniouninfo;
 use Illuminate\Http\Request;
+use App\Models\Sonodnamelist;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Validator;
 
 class UserSonodFeeController extends Controller
@@ -97,19 +100,38 @@ class UserSonodFeeController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getSonodnamelistsWithFees()
+    public function getSonodnamelistsWithFees(Request $request)
     {
-        // Get the authenticated user's unioun
-        $userUnioun = auth()->user()->unioun;
+        // Check if the request is from admin with Bearer token or request token
+        if (Auth::guard('admin')->check()) {
+            // Admin authenticated via session (Bearer token already in place)
+            $user = Auth::guard('admin')->user();
+            $userUnioun = $request->union;
+        } elseif ($request->has('token')) {
+            // Admin authenticated via request token
+            $user = Auth::guard('api')->setToken($request->token)->user();
+            if (!$user) {
+                return response()->json(['error' => 'Unauthorized, invalid token'], 401); // Unauthorized if no valid token
+            }
+            $userUnioun = $request->union;
+        } elseif (Auth::guard('user')->check()) {
+            // User authenticated directly via session
+            $user = Auth::guard('user')->user();
+            $userUnioun = $user->unioun;
+        } else {
+            return response()->json(['error' => 'Unauthorized, valid token or session required'], 401); // Unauthorized if neither admin nor user authenticated
+        }
 
-        // Retrieve Sonodnamelists with fees for the user's unioun
+        // Retrieve Union Information
+        $uniouninfo = Uniouninfo::where('short_name_e', $userUnioun)->first();
+
+        // Retrieve Sonodnamelists with fees for the user's union
         $sonodnamelists = Sonodnamelist::with(['sonodFees' => function ($query) use ($userUnioun) {
-            $query->where('unioun', $userUnioun); // Filter fees by user's unioun
+            $query->where('unioun', $userUnioun);
         }])->get();
 
         // Transform the data
         $data = $sonodnamelists->map(function ($sonodnamelist) use ($userUnioun) {
-            // Retrieve the fee for the user's unioun
             $fee = $sonodnamelist->sonodFees->first();
 
             return [
@@ -119,12 +141,24 @@ class UserSonodFeeController extends Controller
                 'bnname' => $sonodnamelist->bnname,
                 'template' => $sonodnamelist->template,
                 'unioun' => $userUnioun,
-                'fees' => $fee ? $fee->fees : null, // Null if no fees exist for the unioun
+                'fees' => $fee ? $fee->fees : null,
             ];
-        })->filter(); // Remove null entries if no fees are available for the unioun
+        })->filter();
 
-        return response()->json($data);
+        // Check if the request wants a PDF
+        if ($request->has('pdf')) {
+            $html = View::make('pdf.SonodFees', ['data' => $data, 'uniouninfo' => $uniouninfo])->render();
+            return generatePdf($html);
+        }
+
+        return response()->json([
+            'data' => $data,
+            'uniouninfo' => $uniouninfo
+        ]);
     }
+
+
+
 
 
 

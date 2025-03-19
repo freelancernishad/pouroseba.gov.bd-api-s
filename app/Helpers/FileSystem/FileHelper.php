@@ -261,6 +261,55 @@ $ext =  pathinfo($Image, PATHINFO_EXTENSION);;
 
 
 
+
+function convertToBase64($filePath, $defaultImage = 'backend/image.png')
+{
+    if (!$filePath) {
+        // Convert the default image (from root) to base64
+        return convertImageToBase64(base_path($defaultImage));
+    }
+
+    try {
+        // Check if the file exists in the 'protected' storage disk
+        if (Storage::disk('protected')->exists($filePath)) {
+            // Get the file contents from the 'protected' disk
+            $fileContent = Storage::disk('protected')->get($filePath);
+            $mimeType = mime_content_type(storage_path('app/protected/' . $filePath));
+        } else {
+            // Fallback to default image in the root directory
+            return convertImageToBase64(base_path($defaultImage));
+        }
+
+        // Return Base64 encoded string
+        return 'data:' . $mimeType . ';base64,' . base64_encode($fileContent);
+    } catch (\Exception $e) {
+        // If any error occurs, return the default image base64
+        return convertImageToBase64(base_path($defaultImage));
+    }
+}
+
+// Helper function to convert a local image file to Base64
+function convertImageToBase64($fullPath)
+{
+    try {
+        if (!file_exists($fullPath)) {
+            return ''; // Return empty string if file doesn't exist
+        }
+
+        // Read file content
+        $imageContent = file_get_contents($fullPath);
+        $mimeType = mime_content_type($fullPath);
+
+        // Convert to Base64
+        return 'data:' . $mimeType . ';base64,' . base64_encode($imageContent);
+    } catch (\Exception $e) {
+        return ''; // Return empty string if an error occurs
+    }
+}
+
+
+
+
 function handleFileUrl($filePath, $defaultImage = 'https://api.uniontax.gov.bd/backend/image.png')
 {
     if (!$filePath) {
@@ -268,20 +317,16 @@ function handleFileUrl($filePath, $defaultImage = 'https://api.uniontax.gov.bd/b
     }
 
     try {
-        // Check if the application is running on localhost
         if (!isLocalRequest()) {
-            // Generate the full URL for the file
-            return asset('files/' . $filePath);
-
+            return url("/files/{$filePath}");
         } else {
-            // Use the default image from the live server
             return $defaultImage;
         }
     } catch (\Exception $e) {
-        // If the file is not found or cannot be read, set the value to the default image
         return $defaultImage;
     }
 }
+
 
 function isLocalRequest()
 {

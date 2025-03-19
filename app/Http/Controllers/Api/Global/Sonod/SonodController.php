@@ -13,10 +13,11 @@ use App\Models\Sonodnamelist;
 use App\Models\TradeLicenseKhatFee;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Devfaysal\BangladeshGeocode\Models\District;
-use Devfaysal\BangladeshGeocode\Models\Upazila;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Devfaysal\BangladeshGeocode\Models\Upazila;
+use Devfaysal\BangladeshGeocode\Models\District;
 
 class SonodController extends Controller
 {
@@ -47,13 +48,23 @@ class SonodController extends Controller
 
 
             // Generate redirect URL using sonod ID
-            $urls = [
-                "s_uri" => $bnData['s_uri'],
-                "f_uri" => $bnData['f_uri'],
-                "c_uri" => $bnData['c_uri'],
-            ];
+            // $urls = [
+            //     "s_uri" => $bnData['s_uri'],
+            //     "f_uri" => $bnData['f_uri'],
+            //     "c_uri" => $bnData['c_uri'],
+            // ];
 
-            $redirectUrl = sonodpayment($sonod->id, $urls, $hasEnData,$uddoktaId);
+            // $redirectUrl = sonodpayment($sonod->id, $urls, $hasEnData,$uddoktaId);
+
+
+
+                $s_uri = $bnData['s_uri'];
+                $f_uri = $bnData['f_uri'];
+                $c_uri = $bnData['c_uri'];
+
+            $redirectUrl= asset("/create/payment?sonod_id=$sonod->id&s_uri=$s_uri&f_uri=$f_uri&c_uri=$c_uri&hasEnData=$hasEnData&uddoktaId=$uddoktaId");
+
+
 
             // Return the response
             return response()->json([
@@ -135,6 +146,19 @@ class SonodController extends Controller
 
         // Handle the status and charges
         $this->handleCharges($bnData, $enData, $sonodEnName, $insertData);
+
+
+            // Handle base64 image upload
+    if (isset($bnData['image']) && $bnData['image']) {
+        $insertData['image'] = $this->uploadBase64Image(
+            $bnData['image'],
+            $filePath,
+            $dateFolder,
+            $sonodId
+        );
+    }
+
+
 
         // Save the Sonod entry
         $sonod = Sonod::create($insertData);
@@ -279,83 +303,73 @@ class SonodController extends Controller
     }
 
     private function handleFileUploads($request, &$insertData, $filePath, $dateFolder, $sonodId)
-    {
-        // Handle file uploads to S3
-        if (isset($request->bn['image']) && $request->bn['image']) {
-            $this->uploadFile($request->bn['image'], $insertData, 'image', $filePath, $dateFolder, $sonodId);
-        }
+{
 
-        if ($request->hasFile('applicant_national_id_front_attachment')) {
-            $insertData['applicant_national_id_front_attachment'] = uploadDocumentsToS3(
-                $request->file('applicant_national_id_front_attachment'),
-                $filePath,
-                $dateFolder,
-                $sonodId
-            );
-        }
 
-        if ($request->hasFile('applicant_national_id_back_attachment')) {
-            $insertData['applicant_national_id_back_attachment'] = uploadDocumentsToS3(
-                $request->file('applicant_national_id_back_attachment'),
-                $filePath,
-                $dateFolder,
-                $sonodId
-            );
-        }
-
-        if ($request->hasFile('applicant_birth_certificate_attachment')) {
-            $insertData['applicant_birth_certificate_attachment'] = uploadDocumentsToS3(
-                $request->file('applicant_birth_certificate_attachment'),
-                $filePath,
-                $dateFolder,
-                $sonodId
-            );
-        }
+    if ($request->hasFile('applicant_national_id_front_attachment')) {
+        $insertData['applicant_national_id_front_attachment'] = uploadDocumentsToS3(
+            $request->file('applicant_national_id_front_attachment'),
+            $filePath,
+            $dateFolder,
+            $sonodId
+        );
     }
 
-
-
-    private function uploadFile($fileData, &$insertData, $field, $filePath, $dateFolder, $sonodId)
-    {
-        if ($fileData) {
-            // Define the directory for the file
-            $directory = "sonod/$filePath/$dateFolder/$sonodId";
-
-            // Generate a unique file name
-            $fileName = time() . '_' . Str::random(10);
-
-            // Check if the input is base64 data
-            if (preg_match('/^data:image\/(\w+);base64,/', $fileData, $matches)) {
-                // Extract the base64 data
-                $base64Data = substr($fileData, strpos($fileData, ',') + 1);
-
-                // Decode the base64 data
-                $decodedData = base64_decode($base64Data);
-
-                // Determine the file extension from the MIME type
-                $extension = $matches[1]; // e.g., 'png', 'jpeg'
-
-                // Generate the full file name with extension
-                $fileName .= '.' . $extension;
-
-                // Store the file in the protected disk
-                $filePath = Storage::disk('protected')->put("$directory/$fileName", $decodedData);
-
-
-            } else {
-                // Handle file object (e.g., uploaded file)
-                $fileName .= '.' . $fileData->getClientOriginalExtension();
-
-                // Store the file in the protected disk
-                $filePath = Storage::disk('protected')->putFileAs($directory, $fileData, $fileName);
-            }
-
-            // Log::info("$directory/$fileName");
-
-            // Save the file path in the insertData array
-            $insertData[$field] = "$directory/$fileName";
-        }
+    if ($request->hasFile('applicant_national_id_back_attachment')) {
+        $insertData['applicant_national_id_back_attachment'] = uploadDocumentsToS3(
+            $request->file('applicant_national_id_back_attachment'),
+            $filePath,
+            $dateFolder,
+            $sonodId
+        );
     }
+
+    if ($request->hasFile('applicant_birth_certificate_attachment')) {
+        $insertData['applicant_birth_certificate_attachment'] = uploadDocumentsToS3(
+            $request->file('applicant_birth_certificate_attachment'),
+            $filePath,
+            $dateFolder,
+            $sonodId
+        );
+    }
+}
+
+private function uploadBase64Image($fileData, $filePath, $dateFolder, $sonodId)
+{
+    if ($fileData && preg_match('/^data:image\/(\w+);base64,/', $fileData, $matches)) {
+        // Define the directory for the file
+        $directory = "sonod/$filePath/$dateFolder/$sonodId";
+
+        // Extract the base64 data
+        $base64Data = substr($fileData, strpos($fileData, ',') + 1);
+
+        // Decode the base64 data
+        $decodedData = base64_decode($base64Data);
+        if ($decodedData === false) {
+            throw new \Exception("Invalid base64 data provided.");
+        }
+
+        // Determine the file extension from the MIME type
+        $extension = $matches[1]; // e.g., 'png', 'jpeg'
+
+        // Generate a unique file name
+        $fileName = time() . '_' . Str::random(10) . '.' . $extension;
+
+        // Ensure directory exists if using local storage
+        if (!Storage::disk('protected')->exists($directory)) {
+            Storage::disk('protected')->makeDirectory($directory);
+        }
+
+        // Store the file in the protected disk
+        Storage::disk('protected')->put("$directory/$fileName", $decodedData);
+
+        // Return the file path
+        return "$directory/$fileName";
+    }
+    return null;
+}
+
+
 
     private function handleCharges($bnData, $enData, $sonodnamelist, &$insertData)
     {
@@ -488,8 +502,97 @@ class SonodController extends Controller
         }
     }
 
+    function callSonodApi($sonodId, $sonodName = 'নাগরিকত্ব সনদ')
+    {
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+          CURLOPT_URL => 'https://oldbirol.uniontax.gov.bd/api/sonod/search',
+          CURLOPT_RETURNTRANSFER => true,
+          CURLOPT_ENCODING => '',
+          CURLOPT_MAXREDIRS => 10,
+          CURLOPT_TIMEOUT => 0,
+          CURLOPT_FOLLOWLOCATION => true,
+          CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+          CURLOPT_CUSTOMREQUEST => 'POST',
+          CURLOPT_POSTFIELDS =>'{
+            "sonod_Id": "'.$sonodId.'",
+            "sonod_name": "'.$sonodName.'"
+        }',
+          CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json'
+          ),
+        ));
+
+        $response = curl_exec($curl);
+
+
+        curl_close($curl);
+        $response =   json_decode($response);
+
+
+        $additionalData = [
+            'id' => $response->id,
+            'unioun_name' => $response->unioun_name,
+            'year' => $response->year,
+            'sonod_Id' => $response->sonod_Id,
+            'sonod_name' => $response->sonod_name,
+            'applicant_national_id_number' => $response->applicant_national_id_number,
+            'applicant_birth_certificate_number' => $response->applicant_birth_certificate_number,
+            'applicant_name' => $response->applicant_name,
+            'applicant_date_of_birth' => $response->applicant_date_of_birth,
+            'applicant_gender' => $response->applicant_gender,
+            'payment_status' => $response->payment_status,
+            'stutus' => $response->stutus,
+            'successor_list' => $response->successor_list,
+            'orthoBchor' => $response->orthoBchor,
+            'renewed_id' => $response->renewed_id,
+            'renewed' => $response->renewed,
+            'hasEnData' => 0,
+            'renew_able' => 0,
+            'download_url' => "https://oldbirol.uniontax.gov.bd/sonod/d/$response->id",
+            'download_url_en' => "",
+        ];
+        return $additionalData;
+
+
+
+
+
+    }
+
+
+
+
+
     public function findSonod(Request $request)
     {
+
+
+        $sonodId = $request->input('sonod_Id');
+        $sonodName = $request->input('sonod_name');
+        // List of allowed first 6 digits
+        $allowedFirstDigits = [
+            '271709', '271766', '271747', '271795',
+            '271728', '271719', '271738', '271757',
+            '271776', '271785', '271796', '271768'
+        ];
+        // Extract first 6 digits
+        $firstSixDigits = substr($sonodId, 0, 6);
+        // Check if first 6 digits match allowed list
+        if (in_array($firstSixDigits, $allowedFirstDigits)) {
+            $response = $this->callSonodApi($sonodId, $sonodName);
+            return response()->json($response);
+        }
+
+
+
+
+
+
+
+
         // Columns to select
         $columns = [
             'id',
@@ -513,132 +616,87 @@ class SonodController extends Controller
 
         // Retrieve by ID if 'id' is provided
         if ($request->has('id')) {
-            $sonod = Sonod::select($columns)->find($request->input('id'));
-
-            if ($sonod) {
-                // Calculate the current orthoBchor
-                $currentYear = date('Y');
-                $currentMonth = date('m');
-
-                if ($currentMonth >= 7) {
-                    $currentOrthoBchor = $currentYear . '-' . substr(($currentYear + 1), -2);
-                } else {
-                    $currentOrthoBchor = ($currentYear - 1) . '-' . substr($currentYear, -2);
-                }
-
-                // Check if orthoBchor is not current
-                $isNotCurrentOrthoBchor = ($sonod->orthoBchor !== $currentOrthoBchor);
-
-                // Check if renewed_id is not null but renewed is null
-                $isRenewable = (
-                    ($sonod->renewed_id !== null && $sonod->renewed === null) || // Case 1
-                    ($sonod->renewed_id === null && $sonod->renewed === null)    // Case 2
-                );
-
-                // Set renew_able flag
-                $sonod->renew_able = ($isNotCurrentOrthoBchor && $isRenewable);
-
-                // Initialize download URLs
-                $sonod->download_url = '';
-                $sonod->download_url_en = '';
-
-                // Check if the Sonod is approved and paid
-                if ($sonod->stutus === 'Approved' && $sonod->payment_status === 'Paid') {
-                    // Generate the download URL
-                    if ($sonod->renew_able) {
-                        // If renew_able is true, generate the download URL for the renewed Sonod (if applicable)
-                        if ($sonod->renewed_id && $sonod->renewed) {
-                            $sonod->download_url = url("sonod/download/$sonod->renewed_id");
-                            if ($sonod->hasEnData) {
-                                $sonod->download_url_en = url("sonod/download/$sonod->renewed_id?en=true");
-                            }
-                        }
-                    } else {
-                        // If renew_able is false, generate the download URL for the main Sonod
-                        $sonod->download_url = url("sonod/download/$sonod->id");
-                        if ($sonod->hasEnData) {
-                            $sonod->download_url_en = url("sonod/download/$sonod->id?en=true");
-                        }
-                    }
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'data' => $sonod,
-                ]);
-            }
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Sonod not found by ID',
-            ], 404);
+            $results = Sonod::select($columns)->find($request->input('id'));
         }
 
         // Search by `sonod_Id` and `sonod_name` if both are provided
-        $sonodId = $request->input('sonod_Id');
-        $sonodName = $request->input('sonod_name');
+
+
 
         if ($sonodId && $sonodName) {
+
             $results = Sonod::select($columns)
                 ->where('sonod_Id', $sonodId)
                 ->where('sonod_name', $sonodName)
                 ->first();
-
-            if ($results) {
-                // Calculate the current orthoBchor
-                $currentYear = date('Y');
-                $currentMonth = date('m');
-
-                if ($currentMonth >= 7) {
-                    $currentOrthoBchor = $currentYear . '-' . substr(($currentYear + 1), -2);
-                } else {
-                    $currentOrthoBchor = ($currentYear - 1) . '-' . substr($currentYear, -2);
-                }
-
-                // Check if orthoBchor is not current
-                $isNotCurrentOrthoBchor = ($results->orthoBchor !== $currentOrthoBchor);
+         
+        }
 
 
-                // Check if renewed_id is not null but renewed is null
-                $isRenewable = (
-                    ($results->renewed_id && !$results->renewed) || // Case 1
-                    (!$results->renewed_id && !$results->renewed)    // Case 2
-                );
-                // return response()->json($isRenewable);
-                // Set renew_able flag
-                $results->renew_able = ($isNotCurrentOrthoBchor && $isRenewable);
 
-                // Initialize download URLs
-                $results->download_url = '';
-                $results->download_url_en = '';
+        // Check if results are empty and return a message if no data is found
+        if (!$results) {
+            return response()->json([
+                'message' => 'No data found for the provided criteria.',
+                'data' => null
+            ], 404);  // 404 Not Found HTTP status code
+        }
 
-                // Check if the Sonod is approved and paid
-                if ($results->stutus === 'approved' && $results->payment_status === 'Paid') {
-                    // Generate the download URL
-                    if ($results->renew_able) {
-                        // If renew_able is true, generate the download URL for the renewed Sonod (if applicable)
-                        if ($results->renewed_id && $results->renewed) {
-                            $results->download_url = url("sonod/download/$results->renewed_id");
-                            if ($results->hasEnData) {
-                                $results->download_url_en = url("sonod/download/$results->renewed_id?en=true");
-                            }
-                        }
-                    } else {
-                        // If renew_able is false, generate the download URL for the main Sonod
-                        $results->download_url = url("sonod/download/$results->id");
-                        if ($results->hasEnData) {
-                            $results->download_url_en = url("sonod/download/$results->id?en=true");
-                        }
-                    }
-                }
+        if ($results) {
+            // Calculate the current orthoBchor
+            $currentYear = date('Y');
+            $currentMonth = date('m');
 
-                return response()->json($results);
+            if ($currentMonth >= 7) {
+                $currentOrthoBchor = $currentYear . '-' . substr(($currentYear + 1), -2);
+            } else {
+                $currentOrthoBchor = ($currentYear - 1) . '-' . substr($currentYear, -2);
             }
 
-            return response()->json([
-                'error' => 'Sonod not found by sonod_Id and sonod_name',
-            ], 404);
+            // Check if orthoBchor is not current
+            $isNotCurrentOrthoBchor = ($results->orthoBchor !== $currentOrthoBchor);
+
+
+            // Check if renewed_id is not null but renewed is null
+            $isRenewable = (
+                ($results->renewed_id && !$results->renewed) || // Case 1
+                (!$results->renewed_id && !$results->renewed)    // Case 2
+            );
+            // return response()->json($isRenewable);
+            // Set renew_able flag
+            $results->renew_able = ($isNotCurrentOrthoBchor && $isRenewable);
+
+            // Initialize download URLs
+            $results->download_url = '';
+            $results->download_url_en = '';
+
+            // Check if the Sonod is approved and paid
+            if ($results->stutus === 'approved' && $results->payment_status === 'Paid') {
+                // Generate the download URL
+                if ($results->renew_able) {
+                    // If renew_able is true, generate the download URL for the renewed Sonod (if applicable)
+                    if ($results->renewed_id && $results->renewed) {
+                        $results->download_url = url("sonod/download/$results->renewed_id");
+                        if ($results->hasEnData) {
+                            $results->download_url_en = url("sonod/download/$results->renewed_id?en=true");
+                        }
+                    }
+                } else {
+                    // If renew_able is false, generate the download URL for the main Sonod
+                    $results->download_url = url("sonod/download/$results->id");
+                    if ($results->hasEnData) {
+                        $results->download_url_en = url("sonod/download/$results->id?en=true");
+                    }
+                }
+            }
+
+            return response()->json($results);
         }
+
+
+
+
+
 
         return response()->json([
             'error' => 'Invalid search parameters provided',
@@ -797,6 +855,35 @@ class SonodController extends Controller
         }
     }
 
+
+
+
+    function creatingEkpayUrl(Request $request)
+    {
+        // return response()->json('tst');
+        // Extract parameters from the request URL
+        $sonodId = $request->query('sonod_id'); // Get sonod_id from the URL query string
+        $sUri = $request->query('s_uri');       // Get s_uri from the URL query string
+        $fUri = $request->query('f_uri');       // Get f_uri from the URL query string
+        $cUri = $request->query('c_uri');       // Get c_uri from the URL query string
+        $hasEnData = $request->query('hasEnData') ?? 0; // Get hasEnData from the URL query string
+        $uddoktaId = $request->query('uddoktaId'); // Get uddoktaId from the URL query string
+
+        // Prepare the URLs array
+        $urls = [
+            "s_uri" => $sUri,
+            "f_uri" => $fUri,
+            "c_uri" => $cUri,
+        ];
+
+        // Generate the redirect URL using the sonodpayment function
+        $redirectUrl = sonodpayment($sonodId, $urls, $hasEnData, $uddoktaId);
+
+
+        return redirect($redirectUrl);
+        // Return the redirect URL (or use it as needed)
+        return response()->json($redirectUrl);
+    }
 
 
 

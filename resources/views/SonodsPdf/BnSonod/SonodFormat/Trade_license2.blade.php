@@ -91,17 +91,17 @@ $orthoBchor = explode('-',$row->orthoBchor);
         </tr>
     </table>
 
-
-
     @php
+    // Assuming the field name is correctly spelled as 'amount_details'
+    $amount_deails = $row->amount_deails;
 
-        $amount_deails = $row->amount_deails;
-        $amount_deails = json_decode($amount_deails);
-        $tredeLisenceFee = $amount_deails->tredeLisenceFee;
-        $vatAykor = ($tredeLisenceFee*$amount_deails->vatAykor)/100;
+    // Decode the JSON data and ensure it returns an object
+    $amount_deails = json_decode($amount_deails);
 
-
-    @endphp
+    // Check if the data was successfully decoded
+    $tredeLisenceFee = $amount_deails->tredeLisenceFee ?? 0;
+    $vatAykor = isset($amount_deails->vatAykor) ? ($tredeLisenceFee * $amount_deails->vatAykor) / 100 : 0;
+@endphp
 
 
     <table width='100%' style="font-size: 12px;margin-top:10px">
@@ -112,7 +112,7 @@ $orthoBchor = explode('-',$row->orthoBchor);
                     <li>ট্রেড লাইসেন্স ফি (নবায়ন) :-</li>
                     <li>পারমিট ফি  : {{ int_en_to_bn($tredeLisenceFee) }} টাকা</li>
                     <li>সার্ভিস চার্জ : ০.০০ টাকা</li>
-                    <li>বকেয়া : {{ int_en_to_bn($amount_deails->last_years_money) }} টাকা</li>
+                    <li>বকেয়া : {{ int_en_to_bn($amount_deails->last_years_money ?? 0) }} টাকা</li>
                     <li>সাবচার্জ  : ০.০০ টাকা</li>
                 </ul>
             </td>
@@ -120,7 +120,7 @@ $orthoBchor = explode('-',$row->orthoBchor);
         <td width='50%' align ="right">
 
                 <ul style='list-style:none'>
-                    <li>পেশা ব্যবসা ও বৃত্তির উপর কর  :- {{ int_en_to_bn($amount_deails->pesaKor) }} টাকা</li>
+                    <li>পেশা ব্যবসা ও বৃত্তির উপর কর  :- {{ int_en_to_bn($amount_deails->pesaKor ?? 0) }} টাকা</li>
                     <li>সাইনবোর্ড (পরিচিতিমূলক)  : ০.০০ টাকা</li>
                     <li>আয়কর/উৎস কর : ০.০০ টাকা</li>
                     <li>ভ্যাট : {{ int_en_to_bn($vatAykor) }} টাকা</li>
@@ -142,9 +142,9 @@ $orthoBchor = explode('-',$row->orthoBchor);
         <td width='50%' align ="right">
 
             @if($row->hasEnData==1)
-            <b style="color:black">সর্বমোট : {{ int_en_to_bn(($row->currently_paid_money)+$amount_deails->last_years_money) }} টাকা মাত্র </b>
+            <b style="color:black">সর্বমোট : {{ int_en_to_bn(($row->currently_paid_money)+$amount_deails->last_years_money ?? 0) }} টাকা মাত্র </b>
             @else
-            <b style="color:black">সর্বমোট : {{ int_en_to_bn($row->currently_paid_money+$amount_deails->last_years_money) }} টাকা মাত্র </b>
+            <b style="color:black">সর্বমোট : {{ int_en_to_bn($row->currently_paid_money+$amount_deails->last_years_money ?? 0) }} টাকা মাত্র </b>
             @endif
 
 
