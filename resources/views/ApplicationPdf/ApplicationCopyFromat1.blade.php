@@ -59,7 +59,13 @@
         </p></div>
 
         <div class="congrats">অভিনন্দন !</div>
-        <p style="font-size:16px; color:blue; margin-bottom:0px;">ডিজিটাল ইউনিয়ন ট্যাক্স ও সেবা সিস্টেমে আপনার আবেদনটি যথাযথভাবে দাখিল হয়েছে।</p>
+
+
+
+            <p style="font-size:16px; color:blue; margin-bottom:0px;">ক্যাশ লেস , পেপার লেস সেবা সিস্টেমে আপনার আবেদনটি যথাযথভাবে দাখিল হয়েছে।</p>
+
+
+
     </div>
 
     <!-- Information Table -->
@@ -183,8 +189,12 @@
         </tr>
     </table>
 
-    <p class="footer">"সময়মত পৌর কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন।"</p>
-    <p class="footer-small">'পৌরসভা ক্যাশলেস সেবা সিস্টেম' {{ $uniouninfo->domain }} এর সাথে থাকার জন্য ধন্যবাদ</p>
+    @if ($is_union)
+        <p class="footer">"সময়মত ইউনিয়ন কর পরিশোধ করুন। ইউনিয়নের উন্নয়নমূলক কাজে সহায়তা করুন"</p>
+    @else
+        <p class="footer">"সময়মত পৌরসভা কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন"</p>
+    @endif
+    <p class="footer-small">'ক্যাশ লেস , পেপার লেস সেবা সিস্টেম' {{ $uniouninfo->domain }} এর সাথে থাকার জন্য ধন্যবাদ</p>
 
 </body>
 

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Api\Global\Sonod;
 
-use App\Http\Controllers\Controller;
 use App\Models\Sonod;
-use App\Models\Sonodnamelist;
 use App\Models\Uniouninfo;
+use App\Models\SiteSetting;
 use Illuminate\Http\Request;
+use App\Models\Sonodnamelist;
+use App\Http\Controllers\Controller;
 
 class DocumentPdfController extends Controller
 {
@@ -17,9 +18,10 @@ class DocumentPdfController extends Controller
         ini_set("pcre.backtrack_limit", "50000000000000000");
         ini_set('memory_limit', '12008M');
 
+        $is_union = SiteSetting::where('key','union')->first()->value;
         // Fetch necessary data
         $row = Sonod::find($id);
-
+        $isUnion = SiteSetting::where('key','union')->first()->value;
         // Check if the Sonod record exists
         if (!$row) {
             return response()->json([
@@ -57,7 +59,7 @@ class DocumentPdfController extends Controller
 
 
 
-            $htmlView = view('ApplicationPdf.ApplicationCopyWayaris', compact('row', 'sonod', 'uniouninfo'))->render();
+            $htmlView = view('ApplicationPdf.ApplicationCopyWayaris', compact('row', 'sonod', 'uniouninfo','is_union'))->render();
         // } elseif (in_array($EnsonodName, ['Miscellaneous_certificates', 'Certification_of_the_same_name'])) {
             // $htmlView = view('ApplicationPdf.ApplicationCopyFromat2', compact('row', 'sonod', 'uniouninfo'))->render();
         }
@@ -65,7 +67,7 @@ class DocumentPdfController extends Controller
 
             $header = null;
             $footer = null;
-            $htmlView = view('ApplicationPdf.ApplicationCopyFromat1', compact('row', 'sonod', 'uniouninfo'))->render();
+            $htmlView = view('ApplicationPdf.ApplicationCopyFromat1', compact('row', 'sonod', 'uniouninfo','is_union'))->render();
         }
 
         // Generate the PDF with the appropriate header and footer
@@ -138,6 +140,7 @@ class DocumentPdfController extends Controller
     private function pdfFooter($id)
     {
 
+        $is_union = isUnion();
         $row = Sonod::find($id);
         $uniouninfo = Uniouninfo::where('short_name_e', $row->unioun_name)->first();
         $output = "
@@ -180,7 +183,9 @@ class DocumentPdfController extends Controller
 <p style='background: #787878;
     color: white;
     text-align: center;
-    padding: 2px 2px;font-size: 16px;     margin-top: 20px;margin-bottom:0px' class='m-0'>'সময়মত পৌর কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন।'</p>
+    padding: 2px 2px;font-size: 16px; margin-top: 20px;margin-bottom:0px' class='m-0'>
+    <?php echo $is_union ? 'সময়মত ইউনিয়ন কর পরিশোধ করুন। ইউনিয়নের উন্নয়নমূলক কাজে সহায়তা করুন' : 'সময়মত পৌরসভা কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন'; ?>
+</p>
 
 <p class='m-0' style='font-size:14px;text-align:center;margin: 0;'>'ডিজিটাল ইউনিয়ন ট্যাক্স ও সেবা সিস্টেম'  $uniouninfo->domain  এর সাথে থাকার জন্য ধন্যবাদ</p>
 

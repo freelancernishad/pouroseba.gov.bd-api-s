@@ -9,6 +9,7 @@ use App\Models\Sonodnamelist;
 use App\Models\TradeLicenseKhat;
 use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
+use App\Models\SiteSetting;
 use Illuminate\Support\Facades\Auth;
 
 class UniouninfoController extends Controller
@@ -68,7 +69,7 @@ class UniouninfoController extends Controller
         $columns = ['id', 'short_name_e', 'short_name_b', 'thana', 'district', 'web_logo', 'format', 'google_map', 'defaultColor', 'payment_type', 'nidServicestatus', 'nidService', 'u_image', 'u_description', 'u_notice'];
 
         // Fetch Uniouninfo data
-        $uniouninfos = Uniouninfo::where('short_name_e', $shortName)
+        $uniouninfos = Uniouninfo::with('postOffices')->where('short_name_e', $shortName)
             ->select($columns)
             ->first();
 
@@ -129,9 +130,14 @@ class UniouninfoController extends Controller
                 ];
             });
 
+        $site_settings = SiteSetting::pluck('value', 'key')->toArray();
+
+
         $returnData = [
             'uniouninfos' => $uniouninfos,
             'sonod_name_lists' => $sonod_name_lists,
+            'site_settings' => $site_settings,
+            // 'villages' => $uniouninfos->villages,
         ];
 
         return response()->json($returnData, 200);

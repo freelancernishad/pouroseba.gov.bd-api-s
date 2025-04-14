@@ -54,7 +54,11 @@ class UserUniouninfoController extends Controller
                                    'c_signture',
                                    'socib_signture',
                                    'u_image',
-                                   'portal'
+                                   'portal',
+                                   'chairman_phone',
+                                   'secretary_phone',
+                                   'udc_phone',
+                                   'user_phone',
                                ) // Only select the specified columns
                                ->first();
 
@@ -127,6 +131,10 @@ class UserUniouninfoController extends Controller
             'u_notice' => 'nullable|string',
             'defaultColor' => 'nullable|string|max:7',
             'portal' => 'nullable|string|max:255',
+            'chairman_phone' => 'nullable',
+            'secretary_phone' => 'nullable',
+            'udc_phone' => 'nullable',
+            'user_phone' => 'nullable',
         ]);
 
         // Check for validation failure
@@ -138,7 +146,14 @@ class UserUniouninfoController extends Controller
         $validatedData = $validator->validated();
         // Map Bengali `c_type` to English `c_type_en`
         if (isset($validatedData['c_type'])) {
-            $cTypeMap = [
+            $cTypeMap = isUnion() ? [
+                'চেয়ারম্যান' => 'Chairman',
+                'প্যানেল চেয়ারম্যান ১' => 'Panel Chairman 1',
+                'প্যানেল চেয়ারম্যান ২' => 'Panel Chairman 2',
+                'প্যানেল চেয়ারম্যান ৩' => 'Panel Chairman 3',
+                'প্রশাসক' => 'Administrator',
+                'সদস্য/সদস্যা' => 'Member',
+            ] : [
                 'মেয়র' => 'Mayor',
                 'প্যানেল মেয়র ১' => 'Panel Mayor 1',
                 'প্যানেল মেয়র ২' => 'Panel Mayor 2',

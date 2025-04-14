@@ -89,7 +89,7 @@ function HoldingTaxInvoiceBody($unions, $HoldingBokeya, $customers, $previousamo
                                     <img src='https://api.qrserver.com/v1/create-qr-code/?data=" . url("/holding/tax/invoice/{$HoldingBokeya->id}") . "&size=80x80' />
                                 </td>
                                 <td style='text-align: right' width='130px'>
-                                     প্রশাসকের স্বাক্ষর
+                                    " . (isUnion() ? 'ইউপি চেয়ারম্যানের স্বাক্ষর' : 'প্রশাসকের স্বাক্ষর') . "
                                 </td>
                             </tr>
                         </table>

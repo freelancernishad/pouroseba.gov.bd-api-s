@@ -17,6 +17,25 @@ use Devfaysal\BangladeshGeocode\Models\Upazila;
 
 class AdminUniouninfoController extends Controller
 {
+
+
+    public function getAllWithPhones()
+    {
+        $uniouninfos = Uniouninfo::select('full_name','thana','district','chairman_phone', 'secretary_phone', 'udc_phone', 'user_phone')->whereNotNull('chairman_phone')
+            ->orWhereNotNull('secretary_phone')
+            ->orWhereNotNull('udc_phone')
+            ->orWhereNotNull('user_phone')
+            ->get();
+
+        if ($uniouninfos->isEmpty()) {
+            return response()->json(['message' => 'No Uniouninfo records with phone numbers found'], 404);
+        }
+
+        return response()->json(['uniouninfos' => $uniouninfos], 200);
+    }
+
+
+
     /**
      * Display the specified union info.
      *
@@ -498,7 +517,7 @@ class AdminUniouninfoController extends Controller
                 'short_name_b' => $union->bn_name,
                 'thana' => $Upazila->bn_name,
                 'district' => $Upazila->district->bn_name,
-                'c_type' => "প্রশাসক",
+                'c_type' => isUnion() ? "চেয়ারম্যান" : "প্রশাসক",
                 'c_type_en' => "Chairman",
                 'u_code' => $unionCode,
                 "defaultColor" => "green",
@@ -570,6 +589,10 @@ class AdminUniouninfoController extends Controller
                 'u_code' => $uniouninfo->u_code,
                 'AKPAY_MER_REG_ID' => $uniouninfo->AKPAY_MER_REG_ID,
                 'AKPAY_MER_PASS_KEY' => $uniouninfo->AKPAY_MER_PASS_KEY,
+                'chairman_phone' => $uniouninfo->chairman_phone,
+                'secretary_phone' => $uniouninfo->chairman_phone,
+                'udc_phone' => $uniouninfo->chairman_phone,
+                'user_phone' => $uniouninfo->chairman_phone,
             ];
         });
 
@@ -659,8 +682,16 @@ class AdminUniouninfoController extends Controller
             $unioun = strtolower($uniouninfo->short_name_e); // Ensure lowercase
             $Secretary = User::where(['unioun' => $unioun, 'position' => 'Secretary'])->first();
 
-            $merchant_id = $uniouninfo->AKPAY_MER_REG_ID ?? "{$districtShort}_{$upazilaShort}_{$unioun}_up";
-            $pass = $uniouninfo->AKPAY_MER_PASS_KEY ?? "";
+            $merchant_id = ($uniouninfo->AKPAY_MER_REG_ID ?? '') === 'tetulia_test'
+            ? "{$districtShort}_{$upazilaShort}_{$unioun}_up"
+            : ($uniouninfo->AKPAY_MER_REG_ID ?? "{$districtShort}_{$upazilaShort}_{$unioun}_up");
+
+            $pass = ($uniouninfo->AKPAY_MER_REG_ID ?? '') === 'tetulia_test'
+            ? ""
+            : ($uniouninfo->AKPAY_MER_PASS_KEY ?? "");
+
+
+
             return [
                 'merchant_id' => $merchant_id,
                 'pass' => $pass,

@@ -3,6 +3,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateUser;
+use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\PurchaseSmsController;
 use App\Http\Controllers\HoldingTaxImportController;
 use App\Http\Controllers\Api\Coupon\CouponController;
@@ -11,8 +12,10 @@ use App\Http\Controllers\Api\User\Sonod\UserSonodController;
 use App\Http\Controllers\Api\Auth\User\VerificationController;
 use App\Http\Controllers\Api\Payments\FailedPaymentController;
 use App\Http\Controllers\Api\User\Tender\TenderListController;
+use App\Http\Controllers\Api\User\Uniouninfo\VillageController;
 use App\Http\Controllers\Api\User\Package\UserPackageController;
 use App\Http\Controllers\Api\User\Holdingtax\HoldingtaxController;
+use App\Http\Controllers\Api\User\Uniouninfo\PostOfficeController;
 use App\Http\Controllers\Api\Auth\User\UserPasswordResetController;
 use App\Http\Controllers\Api\User\SonodName\UserSonodFeeController;
 use App\Http\Controllers\Api\User\Uniouninfo\UserUniouninfoController;
@@ -118,8 +121,28 @@ Route::prefix('user')->group(function () {
 
 
         Route::get('purchasesms/list', [PurchaseSmsController::class, 'getSmsPurchaseListByUnion']);
-        Route::post('/sms-purchase', [PurchaseSmsController::class, 'createSmsPurchase']);
 
+        Route::post('/sms-purchase', [PurchaseSmsController::class, 'createSmsPurchase']);
+        Route::post('/menual/sms-purchase', [PurchaseSmsController::class, 'createMenualSmsPurchase']);
+
+
+
+        Route::get('/bank-accounts', [BankAccountController::class, 'getByUnion']);
+        Route::post('/bank-accounts', [BankAccountController::class, 'updateOrCreateByUnion']);
+
+
+
+
+        // Authenticated Routes (Protected by Middleware)
+            Route::get('unioun-info/post-office', [PostOfficeController::class, 'index']);
+            Route::post('unioun-info/post-office', [PostOfficeController::class, 'store']);
+            Route::put('unioun-info/post-office/{id}', [PostOfficeController::class, 'update']);
+            Route::delete('unioun-info/post-office/{id}', [PostOfficeController::class, 'destroy']);
+
+            Route::get('unioun-info/village', [VillageController::class, 'index']);
+            Route::post('unioun-info/village', [VillageController::class, 'store']);
+            Route::put('unioun-info/village/{id}', [VillageController::class, 'update']);
+            Route::delete('unioun-info/village/{id}', [VillageController::class, 'destroy']);
 
 
 

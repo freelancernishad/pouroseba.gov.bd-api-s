@@ -562,7 +562,87 @@ private function uploadBase64Image($fileData, $filePath, $dateFolder, $sonodId)
 
     }
 
+    public function findMySonod(Request $request)
+    {
 
+
+
+
+
+        $searchTerm = $request->input('query'); // Get search term
+
+        if (!$searchTerm) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Please provide a search term.'
+            ], 400);
+        }
+
+        // Search for Sonods if any field matches
+        $sonods = Sonod::select(
+                'id',
+                'sonod_name',
+                'uniqeKey',
+                'unioun_name',
+                'applicant_name',
+                'applicant_father_name',
+                'applicant_present_word_number',
+                'created_at',
+                'stutus',
+                'payment_status',
+                'sonod_Id',
+                'prottoyon',
+                'hasEnData',
+                'created_at',
+                'updated_at'
+            )
+            ->where('sonod_Id', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('applicant_name', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('applicant_national_id_number', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('applicant_birth_certificate_number', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('applicant_passport_number', 'LIKE', "%{$searchTerm}%")
+            ->orWhere('applicant_mobile', 'LIKE', "%{$searchTerm}%")
+            ->orderBy('created_at', 'desc') // Order by latest created_at
+            ->paginate(10); // Get list directly
+
+        if ($sonods->isNotEmpty()) {
+            return response()->json([
+                'status' => 'success',
+                'data' => $sonods
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'not_found',
+            'message' => 'No Sonod found with the provided information.'
+        ], 404);
+    }
+
+
+
+    function findMySonodForReApplication(Request $request)
+    {
+        $searchTerm = $request->input('id'); // Get search term
+
+        if (!$searchTerm) {
+            return response()->json([
+            'status' => 'error',
+            'message' => 'Please provide a search term.'
+            ], 400);
+        }
+
+        // Search for the Sonod by unique key and get the first match
+        $sonod = Sonod::where('uniqeKey', $searchTerm)->first(); // Get the first match
+
+        if ($sonod) {
+            return response()->json($sonod);
+        }
+
+        return response()->json([
+            'status' => 'not_found',
+            'message' => 'No Sonod found with the provided unique key.'
+        ], 404);
+    }
 
 
 
@@ -615,6 +695,11 @@ private function uploadBase64Image($fileData, $filePath, $dateFolder, $sonodId)
         ];
 
         // Retrieve by ID if 'id' is provided
+        if ($request->has('uniqeKey')) {
+            $results = Sonod::select($columns)->where("uniqeKey" , $request->input('uniqeKey'))->first();
+        }
+
+        // Retrieve by ID if 'id' is provided
         if ($request->has('id')) {
             $results = Sonod::select($columns)->find($request->input('id'));
         }
@@ -629,7 +714,7 @@ private function uploadBase64Image($fileData, $filePath, $dateFolder, $sonodId)
                 ->where('sonod_Id', $sonodId)
                 ->where('sonod_name', $sonodName)
                 ->first();
-         
+
         }
 
 

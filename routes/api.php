@@ -9,8 +9,10 @@ use App\Http\Controllers\Api\Gateway\Ekpay\EkpayController;
 use App\Http\Controllers\Api\Server\ServerStatusController;
 use App\Http\Controllers\Api\Global\Address\AddressController;
 use App\Http\Controllers\Api\Payments\FailedPaymentController;
+use App\Http\Controllers\Api\User\Uniouninfo\VillageController;
 use App\Http\Controllers\Api\User\Package\UserPackageController;
 use App\Http\Controllers\Api\User\Holdingtax\HoldingtaxController;
+use App\Http\Controllers\Api\User\Uniouninfo\PostOfficeController;
 use App\Http\Controllers\Api\Auth\Uddokta\CitizenInformationController;
 use App\Http\Controllers\Api\User\PackageAddon\UserPackageAddonController;
 
@@ -70,10 +72,18 @@ Route::prefix('global/')->group(function () {
 
 
 
+
+
+
+
+
 });
 
 Route::get('global/uniouninfo', [UniouninfoController::class, 'getByShortName']);
 Route::post('global/uniouninfo', [UniouninfoController::class, 'getByShortName']);
+
+Route::get('global/get/village/{union}/{word}', [VillageController::class, 'getVillageByUnionWord']);
+Route::get('global/get/post/office/{upazila_id}', [PostOfficeController::class, 'getPostOfficesByUnionName']);
 
 
 Route::get('holdingtax/search', [HoldingtaxController::class, 'holdingSearch']);
@@ -84,8 +94,17 @@ Route::post('/pay/holding/tax/{id}', [HoldingtaxController::class,'holding_tax_p
 
 
 Route::post('sonod/submit', [SonodController::class, 'sonodSubmit']);
+
 Route::post('sonod/search', [SonodController::class, 'findSonod']);
 Route::get('sonod/search', [SonodController::class, 'findSonod']);
+
+Route::post('my/sonod/search', [SonodController::class, 'findMySonod']);
+Route::get('my/sonod/search', [SonodController::class, 'findMySonod']);
+
+
+Route::get('sonod/search/for/re-applicaion', [SonodController::class, 'findMySonodForReApplication']);
+
+
 Route::post('sonod/renew/{id}', [SonodController::class, 'renewSonod']);
 
 Route::post('ekpay/ipn',[EkpayController::class ,'ipn']);
