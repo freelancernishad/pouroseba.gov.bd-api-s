@@ -106,6 +106,18 @@ function sonodView_Inheritance_certificate($id){
         $text = 'উত্তরাধিকারীগণের নাম ও সম্পর্ক';
     }
 
+
+    $is_union = isUnion();
+
+    if ($is_union) {
+        $memberText = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত ওয়ারিশান সনদের সকল দায়ভার সংশ্লিষ্ট ইউপি সদস্য/সদস্যার যাচাইকারীর ওপর বর্তাইবে ।</p>';
+        $daybodho = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত উত্তরাধিকারী সনদের সকল দায়ভার  সংশ্লিষ্ট ইউপি সদস্য/সদস্যার যাচাইকারীর ওপর বর্তাইবে ।</p>';
+    } else {
+        $memberText = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত ওয়ারিশান সনদের সকল দায়ভার সংশ্লিষ্ট পৌরসভা ওয়ার্ড সহকারির ওপর বর্তাইবে ।</p>';
+        $daybodho = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত উত্তরাধিকারী সনদের সকল দায়ভার  সংশ্লিষ্ট পৌরসভা ওয়ার্ড সহকারির ওপর বর্তাইবে ।</p>';
+    }
+
+
     $w_list = $row->successor_list;
     $w_list = json_decode($w_list);
 
@@ -141,7 +153,7 @@ if ($sonod_name == 'ওয়ারিশান সনদ') {
             ';
 
 
-            $nagoriinfo .= '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত ওয়ারিশান সনদের সকল দায়ভার  সংশ্লিষ্ট ইউপি সদস্য/সদস্যার যাচাইকারীর ওপর বর্তাইবে ।</p>';
+            $nagoriinfo .= "$memberText";
 
 
 
@@ -155,7 +167,7 @@ if ($sonod_name == 'ওয়ারিশান সনদ') {
             </p>';
 
 
-            $nagoriinfo .= '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত উত্তরাধিকারী সনদের সকল দায়ভার  সংশ্লিষ্ট ইউপি সদস্য/সদস্যার যাচাইকারীর ওপর বর্তাইবে ।</p>';
+            $nagoriinfo .= "$daybodho";
 
 
 
