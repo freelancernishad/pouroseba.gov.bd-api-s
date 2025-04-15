@@ -110,9 +110,11 @@ function sonodView_Inheritance_certificate($id){
     $is_union = isUnion();
 
     if ($is_union) {
+        $wordShohokari = 'ওয়ার্ডের ইউপি সদস্য';
         $memberText = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত ওয়ারিশান সনদের সকল দায়ভার সংশ্লিষ্ট ইউপি সদস্য/সদস্যার যাচাইকারীর ওপর বর্তাইবে ।</p>';
         $daybodho = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত উত্তরাধিকারী সনদের সকল দায়ভার  সংশ্লিষ্ট ইউপি সদস্য/সদস্যার যাচাইকারীর ওপর বর্তাইবে ।</p>';
     } else {
+        $wordShohokari = 'ওয়ার্ড সহকারি';
         $memberText = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত ওয়ারিশান সনদের সকল দায়ভার সংশ্লিষ্ট পৌরসভা ওয়ার্ড সহকারির ওপর বর্তাইবে ।</p>';
         $daybodho = '<p style="margin: 0;font-size:11px;">বিঃদ্রঃ উক্ত উত্তরাধিকারী সনদের সকল দায়ভার  সংশ্লিষ্ট পৌরসভা ওয়ার্ড সহকারির ওপর বর্তাইবে ।</p>';
     }
@@ -232,7 +234,7 @@ $nagoriinfo .= '<h4 style="text-align:center;margin-bottom:0px;font-size:11px">'
 </p><br>
 
 <p style="margin-top:-18px;margin-bottom:1px;font-size:11px">
-সংশ্লিষ্ট ওয়ার্ডের ইউপি সদস্য কর্তৃক আবেদনকারীর দাখিলকৃত তথ্য যাচাই/সত্যায়নের পরিপ্রেক্ষিতে অত্র সনদপত্র প্রদান করা হলো।
+সংশ্লিষ্ট '.$wordShohokari.' কর্তৃক আবেদনকারীর দাখিলকৃত তথ্য যাচাই/সত্যায়নের পরিপ্রেক্ষিতে অত্র সনদপত্র প্রদান করা হলো।
 </p> <br/>
 <p style="margin-top:-18px; margin-bottom:0px;font-size:11px">
 &nbsp; &nbsp; &nbsp; আমি তাঁর/তাঁদের সর্বাঙ্গীন উন্নতি ও মঙ্গল কামনা করছি।
