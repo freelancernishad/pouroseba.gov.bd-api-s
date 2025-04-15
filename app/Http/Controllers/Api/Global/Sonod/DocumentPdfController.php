@@ -21,7 +21,7 @@ class DocumentPdfController extends Controller
         $is_union = isUnion();
         // Fetch necessary data
         $row = Sonod::find($id);
-        $isUnion = SiteSetting::where('key','union')->first()->value;
+
         // Check if the Sonod record exists
         if (!$row) {
             return response()->json([
@@ -80,6 +80,9 @@ class DocumentPdfController extends Controller
         $row = Sonod::find($id);
         $uniouninfo = Uniouninfo::where('short_name_e', $row->unioun_name)->first();
 
+
+        $is_union = isUnion();
+
         $output = "
 
 
@@ -119,7 +122,7 @@ class DocumentPdfController extends Controller
             </div>
             <br>
             <p style='font-size: 16px; color: blue; margin-bottom: 0px !important;'>
-                ডিজিটাল ইউনিয়ন ট্যাক্স ও সেবা সিস্টেমে আপনার আবেদনটি যথাযথভাবে দাখিল হয়েছে।
+                ক্যাশ লেস , পেপার লেস সেবা সিস্টেমে আপনার আবেদনটি যথাযথভাবে দাখিল হয়েছে।
             </p>
         </div>
         ";
