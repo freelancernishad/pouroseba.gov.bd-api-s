@@ -151,13 +151,54 @@ class DocumentPdfController extends Controller
 
 
 
-    <table width='100%' style='border-collapse: collapse;margin-top:60px' border='0'>
+        <table width='100%' style='border-collapse: collapse;margin-top:60px' border='0'>
         <tr>
-            <td  style='text-align: center;' width='40%'>
-                <div class='signature text-center position-relative'>
-                    <b><span style='color:#7230A0;font-size:18px;'>
-                        {{ $is_union ? 'সংশ্লিষ্ট ইউপি সদস্যের স্বাক্ষর ও সীল' : 'সংশ্লিষ্ট পৌর কাউন্সিলরের স্বাক্ষর ও সীল' }}
-                    </span> <br />
+            <td style='text-align: center;' width='40%'>
+            <div class='signature text-center position-relative'>
+            <b><span style='color:#7230A0;font-size:18px;'>
+            " . ($is_union ? 'সংশ্লিষ্ট ইউপি সদস্যের স্বাক্ষর ও সীল' : 'সংশ্লিষ্ট পৌর কাউন্সিলরের স্বাক্ষর ও সীল') . "
+            </span> <br />
+            </div>
+            </td>
+            <td style='text-align: center; width: 200px;' width='30%'>
+
+            </td>
+            <td style='text-align: center;' width='40%'>
+            <div class='signature text-center position-relative'>
+
+            <b><span style='color:#7230A0;font-size:18px;'> $row->chaireman_name</span> <br />
+                </b><span style='font-size:16px;'> $row->chaireman_type </span><br />
+
+            $uniouninfo->full_name <br>  $uniouninfo->thana , $uniouninfo->district  । <br>
+
+
+            </div>
+            </td>
+        </tr>
+
+
+        </table>
+
+
+
+        <p style='background: #787878;
+        color: white;
+        text-align: center;
+        padding: 2px 2px;font-size: 16px; margin-top: 20px;margin-bottom:0px' class='m-0'>";
+
+         $output .= ($is_union ? 'সময়মত ইউনিয়ন কর পরিশোধ করুন। ইউনিয়নের উন্নয়নমূলক কাজে সহায়তা করুন' : 'সময়মত পৌরসভা কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন');
+
+        $output .= "</p>
+
+        <p class='m-0' style='font-size:14px;text-align:center;margin: 0;'>'ক্যাশ লেস , পেপার লেস সেবা সিস্টেম'  $uniouninfo->domain  এর সাথে থাকার জন্য ধন্যবাদ</p>
+
+
+
+
+
+        </div>
+
+        ";
 
 
 
