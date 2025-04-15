@@ -155,7 +155,9 @@ class DocumentPdfController extends Controller
         <tr>
             <td  style='text-align: center;' width='40%'>
                 <div class='signature text-center position-relative'>
-                    <b><span style='color:#7230A0;font-size:18px;'>সংশ্লিষ্ট ইউপি সদস্যের স্বাক্ষর ও সীল</span> <br />
+                    <b><span style='color:#7230A0;font-size:18px;'>
+                        {{ $is_union ? 'সংশ্লিষ্ট ইউপি সদস্যের স্বাক্ষর ও সীল' : 'সংশ্লিষ্ট পৌর কাউন্সিলরের স্বাক্ষর ও সীল' }}
+                    </span> <br />
 
 
 
