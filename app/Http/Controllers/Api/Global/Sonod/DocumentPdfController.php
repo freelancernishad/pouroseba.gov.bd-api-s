@@ -18,7 +18,7 @@ class DocumentPdfController extends Controller
         ini_set("pcre.backtrack_limit", "50000000000000000");
         ini_set('memory_limit', '12008M');
 
-        $is_union = SiteSetting::where('key','union')->first()->value;
+        $is_union = isUnion();
         // Fetch necessary data
         $row = Sonod::find($id);
         $isUnion = SiteSetting::where('key','union')->first()->value;
@@ -184,7 +184,7 @@ class DocumentPdfController extends Controller
     color: white;
     text-align: center;
     padding: 2px 2px;font-size: 16px; margin-top: 20px;margin-bottom:0px' class='m-0'>
-    <?php echo $is_union ? 'সময়মত ইউনিয়ন কর পরিশোধ করুন। ইউনিয়নের উন্নয়নমূলক কাজে সহায়তা করুন' : 'সময়মত পৌরসভা কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন'; ?>
+    <?php echo is_union() ? 'সময়মত ইউনিয়ন কর পরিশোধ করুন। ইউনিয়নের উন্নয়নমূলক কাজে সহায়তা করুন' : 'সময়মত পৌরসভা কর পরিশোধ করুন। পৌরসভার উন্নয়নমূলক কাজে সহায়তা করুন'; ?>
 </p>
 
 <p class='m-0' style='font-size:14px;text-align:center;margin: 0;'>'ডিজিটাল ইউনিয়ন ট্যাক্স ও সেবা সিস্টেম'  $uniouninfo->domain  এর সাথে থাকার জন্য ধন্যবাদ</p>

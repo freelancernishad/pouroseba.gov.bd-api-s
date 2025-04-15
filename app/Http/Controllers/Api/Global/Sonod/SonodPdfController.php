@@ -138,7 +138,7 @@ class SonodPdfController extends Controller
     {
 
 
-        $is_union = SiteSetting::where('key','union')->first()->value;
+        $is_union = isUnion();
 
         $namelength = strlen($row->sonod_name);
         $width = '300px';  // Default width
