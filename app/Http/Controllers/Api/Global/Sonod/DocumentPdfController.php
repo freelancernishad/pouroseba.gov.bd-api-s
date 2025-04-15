@@ -192,7 +192,7 @@ class DocumentPdfController extends Controller
 
 $output .= "</p>
 
-<p class='m-0' style='font-size:14px;text-align:center;margin: 0;'>'ডিজিটাল ইউনিয়ন ট্যাক্স ও সেবা সিস্টেম'  $uniouninfo->domain  এর সাথে থাকার জন্য ধন্যবাদ</p>
+<p class='m-0' style='font-size:14px;text-align:center;margin: 0;'>'ক্যাশ লেস , পেপার লেস সেবা সিস্টেম'  $uniouninfo->domain  এর সাথে থাকার জন্য ধন্যবাদ</p>
 
 
 
