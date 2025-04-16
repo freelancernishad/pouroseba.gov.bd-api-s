@@ -36,8 +36,15 @@
                 ডাকঘর- {{ $row->ut_post }},
                 উপজেলা: {{ $row->ut_thana }},
                 জেলা- {{ $row->ut_district }}।
-                তিনি অত্র ইউনিয়নের {{ int_en_to_bn($row->ut_word) }} নং ওয়ার্ডের
+                তিনি
+                @if(isUnion())
+                    অত্র ইউনিয়নের
+                @else
+                    অত্র পৌরসভার
+                @endif
+                {{ int_en_to_bn($row->ut_word) }} নং ওয়ার্ডের
                 {{ $row->applicant_resident_status }} বাসিন্দা ছিলেন। মৃত্যুকালে তিনি নিম্নোক্ত ওয়ারিশগণ রেখে যান। নিম্নে তাঁর ওয়ারিশ/ওয়ারিশগণের নাম ও সম্পর্ক উল্লেখ করা হলো।
+
                 <br><br>
                 &nbsp;&nbsp;&nbsp; আমি {{ $deathStatus2 }} বিদেহী আত্মার মাগফেরাত কামনা করি।
             </p>
@@ -56,8 +63,15 @@
                 ডাকঘর- {{ $row->ut_post }},
                 উপজেলা: {{ $row->ut_thana }},
                 জেলা- {{ $row->ut_district }}।
-                তিনি অত্র ইউনিয়নের {{ int_en_to_bn($row->ut_word) }} নং ওয়ার্ডের
+                তিনি
+                @if(isUnion())
+                    অত্র ইউনিয়নের
+                @else
+                    অত্র পৌরসভার
+                @endif
+                {{ int_en_to_bn($row->ut_word) }} নং ওয়ার্ডের
                 {{ $row->applicant_resident_status }} বাসিন্দা। নিম্নে তাঁর উত্তরাধিকারী/উত্তরাধিকারীগণের নাম ও সম্পর্ক উল্লেখ করা হলো।
+
                 <br><br>
             </p>
 
