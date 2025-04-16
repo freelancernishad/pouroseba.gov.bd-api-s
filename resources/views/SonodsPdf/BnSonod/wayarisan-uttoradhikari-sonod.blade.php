@@ -117,7 +117,7 @@
                 {{ $uniouninfo->full_name }} {{ $uniouninfo->thana }}, {{ $uniouninfo->district }}।  {{ $uniouninfo->ut_word }} নং
                 ইউপি সদস্য
                 @else
-                পৌরসভা কাউন্সিলর
+                ওয়ার্ড সহকারি
                 @endif
                 কর্তৃক আবেদনকারীর দাখিলকৃত তথ্য যাচাই/সত্যায়নের পরিপ্রেক্ষিতে অত্র সনদপত্র প্রদান করা হলো।
             </p> <br/>     <p style="margin-top:-10px; margin-bottom:0px">
